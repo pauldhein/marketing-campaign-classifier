@@ -11,6 +11,7 @@ def main():
             f"Program requires exaclty one input: path to a CSV dataset"
         )
     # Load the full dataset into a dataframe
+    # NOTE: setting data types to ensure we get categorical types for each str value
     csv_data_path = sys.argv[1]
     df = pd.read_csv(
         csv_data_path,
@@ -40,8 +41,9 @@ def main():
             "y": "category",
         },
     )
-
     print(df)
+
+    # NOTE: transform all categorical data types to integer encodings
     cat_columns = df.select_dtypes(["category"]).columns
     df[cat_columns] = df[cat_columns].apply(lambda x: x.cat.codes)
     print(df)
