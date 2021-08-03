@@ -1,6 +1,5 @@
 from typing import List, Tuple
 
-from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 
 
