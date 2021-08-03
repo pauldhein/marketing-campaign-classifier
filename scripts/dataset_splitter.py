@@ -12,7 +12,38 @@ def main():
         )
     # Load the full dataset into a dataframe
     csv_data_path = sys.argv[1]
-    df = pd.read_csv(csv_data_path, sep=";", quotechar='"')
+    df = pd.read_csv(
+        csv_data_path,
+        sep=";",
+        quotechar='"',
+        dtype={
+            "age": "int64",
+            "job": "category",
+            "marital": "category",
+            "education": "category",
+            "default": "category",
+            "housing": "category",
+            "loan": "category",
+            "contact": "category",
+            "month": "category",
+            "day_of_week": "category",
+            "duration": "int64",
+            "campaign": "int64",
+            "pdays": "int64",
+            "previous": "int64",
+            "poutcome": "category",
+            "emp.var.rate": "float64",
+            "cons.price.idx": "float64",
+            "cons.conf.idx": "float64",
+            "euribor3m": "float64",
+            "nr.employed": "float64",
+            "y": "category",
+        },
+    )
+
+    print(df)
+    cat_columns = df.select_dtypes(["category"]).columns
+    df[cat_columns] = df[cat_columns].apply(lambda x: x.cat.codes)
     print(df)
 
     # Shuffle and split the dataset into train, dev, and test folds
