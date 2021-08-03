@@ -1,22 +1,33 @@
-from typing import List
+from typing import List, Tuple
 
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 
 
 def load_dataset(dataset_path: str) -> "DataFrame":
-    return pd.read_csv(dataset_path, sep=";", quotechar='"')
-
-
-def make_categorical_encoder(cat_examples: List[str]) -> LabelEncoder:
-    """Creates a label encoder for a specific categorical feature.
+    """Load a dataset into a pandas dataframe. Transform all categorical values into codes
 
     Args:
-        cat_examples (List[str]): A list of all the examples for the categorical feature
+        dataset_path (str): A path to a dataset csv file
 
     Returns:
-        LabelEncoder: A Scikit-Learn label encoder that can translate between string labels and integer feature values
+        DataFrame: a pandas dataframe with all categorical values transformed into numerical encodings.
     """
-    encoder = preprocessing.LabelEncoder()
-    encoder.fit(cat_examples)
-    return encoder
+
+    return pd.read_csv(
+        dataset_path,
+        sep=";",
+        quotechar='"',
+    )
+
+
+def get_X_and_y(df: "DataFrame") -> Tuple["DataFrame", "DataFrame"]:
+    """Separate a pandas dataframe into X features and y labels.
+
+    Args:
+        df (DataFrame): A pandas dataframe containing both features and labels
+
+    Returns:
+        Tuple[DataFrame, DataFrame]: one DataFrame for the features and another for the single column of labels
+    """
+    return df.loc[:, df.columns != "y"], df["y"]
