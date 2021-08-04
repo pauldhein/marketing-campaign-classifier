@@ -129,5 +129,8 @@ dmypy.json
 .pyre/
 
 
-#macOS specific files
+# macOS specific files
 *.DS_Store
+
+# Dev env
+.vscode
