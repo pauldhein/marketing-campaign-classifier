@@ -79,7 +79,6 @@ def train_and_save_classifier(
         scoring="balanced_accuracy",
     )
 
-    # classifier = clfs.BEST_MLP_CLASSIFIER
     print(f"\nBeginning classifier fit for:\n{str(classifier)}\n")
     classifier.fit(train_X, train_y)
     dev_preds = classifier.predict(dev_X)

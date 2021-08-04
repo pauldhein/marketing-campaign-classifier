@@ -45,7 +45,7 @@ def main(args):
 
     print("\nFinished loading and prepping train/dev/test data...")
 
-    train_and_save_classifier(
+    utils.train_and_save_classifier(
         clfs.LR_CLASSIFIER,
         clfs.LR_PARAMS,
         "logisitic_regression",
@@ -55,7 +55,7 @@ def main(args):
         dev_y,
     )
 
-    train_and_save_classifier(
+    utils.train_and_save_classifier(
         clfs.RF_CLASSIFIER,
         clfs.RF_PARAMS,
         "random_forest",
@@ -65,7 +65,7 @@ def main(args):
         dev_y,
     )
 
-    train_and_save_classifier(
+    utils.train_and_save_classifier(
         clfs.NB_CLASSIFIER,
         clfs.NB_PARAMS,
         "logisitic_regression",
@@ -75,7 +75,7 @@ def main(args):
         dev_y,
     )
 
-    train_and_save_classifier(
+    utils.train_and_save_classifier(
         clfs.SVM_CLASSIFIER,
         clfs.SVM_PARAMS,
         "logisitic_regression",
@@ -85,7 +85,7 @@ def main(args):
         dev_y,
     )
 
-    train_and_save_classifier(
+    utils.train_and_save_classifier(
         clfs.MLP_CLASSIFIER,
         clfs.MLP_PARAMS,
         "neural_net",
