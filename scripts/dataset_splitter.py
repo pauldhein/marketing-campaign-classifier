@@ -43,9 +43,15 @@ def main():
     )
     print(df)
 
-    # NOTE: transform all categorical data types to integer encodings
-    cat_columns = df.select_dtypes(["category"]).columns
-    df[cat_columns] = df[cat_columns].apply(lambda x: x.cat.codes)
+    # Transform label to integer encoding
+    y_df = (df["y"]).to_frame().apply(lambda x: x.cat.codes)
+
+    # Remove label from data and then transform categorical features to one-hot
+    df.drop(columns="y", inplace=True)
+    one_hot_df = pd.get_dummies(df)
+
+    # Add labels back in to full dataset
+    df = one_hot_df.join(y_df)
     print(df)
 
     # Shuffle and split the dataset into train, dev, and test folds
