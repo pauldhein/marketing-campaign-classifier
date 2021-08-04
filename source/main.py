@@ -1,13 +1,16 @@
 import argparse
+import pickle
+import sys
 
-from sklearn.feature_selection import VarianceThreshold, SelectFromModel
-from sklearn.svm import LinearSVC
-from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import precision_score, recall_score, f1_score
+from imblearn.over_sampling import RandomOverSampler
+
+from sklearn.feature_selection import (
+    SelectPercentile,
+    mutual_info_classif,
+)
 
 import utils
+import classifiers as clfs
 
 
 def main(args):
@@ -15,69 +18,82 @@ def main(args):
     dev_file = args.dataset_path + "_dev.csv"
     test_file = args.dataset_path + "_test.csv"
 
-    print("Loading train/dev/test data-frames")
+    print("Loading train/dev/test data-frames...")
     train_df = utils.load_dataset(train_file)
     dev_df = utils.load_dataset(dev_file)
     test_df = utils.load_dataset(test_file)
-
-    # TODO: try using variance feature selection after creating
-    # one-hot encoded data
-    # variance_selector = VarianceThreshold(threshold=(0.8 * (1 - 0.8)))
 
     train_X, train_y = utils.get_X_and_y(train_df)
     dev_X, dev_y = utils.get_X_and_y(dev_df)
     test_X, test_y = utils.get_X_and_y(test_df)
 
+    # Perform feature selection based upon mutual information
+    print("\nBeginning feature selection using mutual information criteria...")
+    selector = SelectPercentile(mutual_info_classif, percentile=25)
+    selector.fit_transform(train_X, train_y)
+    good_features = selector.get_support(indices=True)
+
+    # Select well performing features only for all datasets
+    train_X = train_X.iloc[:, good_features]
+    dev_X = dev_X.iloc[:, good_features]
+    test_X = test_X.iloc[:, good_features]
+
+    # Oversampling to adjust for the large class imbalance
+    print("\nOversampling to correct for class imbalance...")
+    ros = RandomOverSampler(random_state=17)
+    balanced_trainX, balanced_train_Y = ros.fit_resample(train_X, train_y)
+
     print("\nFinished loading and prepping train/dev/test data...")
 
-    # NOTE: Using sensible defaults for now
-    # NOTE: Using balanced class weighting to correct for the major class imbalance
-    classifier = MLPClassifier(
-        hidden_layer_sizes=(50, 20),
-        max_iter=500,
-        random_state=17,
+    train_and_save_classifier(
+        clfs.LR_CLASSIFIER,
+        clfs.LR_PARAMS,
+        "logisitic_regression",
+        balanced_trainX,
+        balanced_train_Y,
+        dev_X,
+        dev_y,
     )
-    # classifier = Pipeline(
-    #     [
-    #         (
-    #             "feature_selection",
-    #             SelectFromModel(LinearSVC(penalty="l1", dual=False)),
-    #         ),
-    #         (
-    #             "classification",
-    #             RandomForestClassifier(
-    #                 max_depth=None,
-    #                 n_estimators=50,
-    #                 min_samples_split=2,
-    #                 max_features="sqrt",
-    #                 class_weight="balanced",
-    #             ),
-    #         ),
-    #     ]
-    # )
 
-    # NOTE: Current best RandomForest Classifier settings
-    # classifier = RandomForestClassifier(
-    #     max_depth=None,
-    #     n_estimators=50,
-    #     min_samples_split=2,
-    #     max_features="sqrt",
-    #     class_weight="balanced",
-    # )
+    train_and_save_classifier(
+        clfs.RF_CLASSIFIER,
+        clfs.RF_PARAMS,
+        "random_forest",
+        balanced_trainX,
+        balanced_train_Y,
+        dev_X,
+        dev_y,
+    )
 
-    # NOTE: Current GradientBoostingClassifier settings
-    # classifier = GradientBoostingClassifier(
-    #     n_estimators=100, learning_rate=1.0, max_depth=1, random_state=17
-    # )
+    train_and_save_classifier(
+        clfs.NB_CLASSIFIER,
+        clfs.NB_PARAMS,
+        "logisitic_regression",
+        balanced_trainX,
+        balanced_train_Y,
+        dev_X,
+        dev_y,
+    )
 
-    print(f"\nBeginning classifier fit for:\n{str(classifier)}\n")
-    classifier.fit(train_X, train_y)
-    dev_preds = classifier.predict(dev_X)
+    train_and_save_classifier(
+        clfs.SVM_CLASSIFIER,
+        clfs.SVM_PARAMS,
+        "logisitic_regression",
+        balanced_trainX,
+        balanced_train_Y,
+        dev_X,
+        dev_y,
+    )
 
-    p = precision_score(dev_y, dev_preds)
-    r = recall_score(dev_y, dev_preds)
-    f = f1_score(dev_y, dev_preds)
-    print(f"PRECISION={p:.4f}, RECALL={r:.4f}, F1={f:.4f}")
+    train_and_save_classifier(
+        clfs.MLP_CLASSIFIER,
+        clfs.MLP_PARAMS,
+        "neural_net",
+        balanced_trainX,
+        balanced_train_Y,
+        dev_X,
+        dev_y,
+    )
 
 
 if __name__ == "__main__":
