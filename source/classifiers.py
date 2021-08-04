@@ -18,12 +18,12 @@ RF_CLASSIFIER = RandomForestClassifier(
     min_samples_split=2,
 )
 RF_PARAMS = {
-    "classifier__max_features": [1, 2, 5, 10, 20],
+    "classifier__max_features": [1, 2, 5, 10, 15],
     "classifier__n_estimators": [2, 5, 10, 20, 50, 100],
 }
 
 MLP_CLASSIFIER = MLPClassifier(
-    max_iter=200,
+    max_iter=500,
     random_state=17,
 )
 MLP_PARAMS = {
@@ -47,7 +47,7 @@ BEST_MLP_CLASSIFIER = MLPClassifier(
 NB_CLASSIFIER = GaussianNB()
 NB_PARAMS = {}
 
-SVM_CLASSIFIER = SVC(kernel="rbf", max_iter=200, random_state=17)
+SVM_CLASSIFIER = SVC(kernel="rbf", max_iter=500, random_state=17)
 SVM_PARAMS = {
     "classifier__C": [0.1, 0.5, 1.0, 2.0, 5.0],
     "classifier__gamma": [0.1, 0.5, 1.0, 5.0, 10.0],

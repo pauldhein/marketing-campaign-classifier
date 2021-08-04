@@ -1,6 +1,4 @@
 import argparse
-import pickle
-import sys
 
 from imblearn.over_sampling import RandomOverSampler
 
@@ -32,6 +30,8 @@ def main(args):
     selector = SelectPercentile(mutual_info_classif, percentile=25)
     selector.fit_transform(train_X, train_y)
     good_features = selector.get_support(indices=True)
+    print(f"Number of features to use: {len(good_features)}")
+    print(f"Feature column names:\n{dev_X.iloc[:, good_features].columns}")
 
     # Select well performing features only for all datasets
     train_X = train_X.iloc[:, good_features]
@@ -48,7 +48,7 @@ def main(args):
     utils.train_and_save_classifier(
         clfs.LR_CLASSIFIER,
         clfs.LR_PARAMS,
-        "logisitic_regression",
+        "logistic_regression",
         balanced_trainX,
         balanced_train_Y,
         dev_X,
@@ -68,7 +68,7 @@ def main(args):
     utils.train_and_save_classifier(
         clfs.NB_CLASSIFIER,
         clfs.NB_PARAMS,
-        "logisitic_regression",
+        "naive_bayes",
         balanced_trainX,
         balanced_train_Y,
         dev_X,
@@ -78,7 +78,7 @@ def main(args):
     utils.train_and_save_classifier(
         clfs.SVM_CLASSIFIER,
         clfs.SVM_PARAMS,
-        "logisitic_regression",
+        "rbf_svm",
         balanced_trainX,
         balanced_train_Y,
         dev_X,

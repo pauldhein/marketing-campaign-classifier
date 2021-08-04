@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import pickle
 
 import pandas as pd
 
@@ -74,7 +75,7 @@ def train_and_save_classifier(
         ),
         params,
         cv=10,
-        verbose=2,
+        verbose=1,
         n_jobs=4,
         scoring="balanced_accuracy",
     )
@@ -84,7 +85,7 @@ def train_and_save_classifier(
     dev_preds = classifier.predict(dev_X)
 
     print(f"Scores for {name} classifier")
-    utils.compute_and_show_scores(dev_y, dev_preds)
+    compute_and_show_scores(dev_y, dev_preds)
 
     pickle.dump(
         classifier, open(f"../data/trained_{name}_classifier.pkl", "wb")
