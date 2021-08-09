@@ -1,4 +1,4 @@
-# Predicting Bank Term Deposits from Marketing Campaign Data
+# Predicting BTD Purchases from Marketing Campaign Data
 
 ## Project Goal
 
@@ -17,27 +17,43 @@ This project makes use of the [UCI bank marketing data set](https://archive.ics.
 
 ### Dataset preprocessing
 
-This experiment ...
+This experiment processes a CSV dataset into train/dev/test folds after first converting the label column to binary and all string-valued columns to categorical data. Categorical data columns are also one-hot encoded to aid in training. The script can be run with the following command:
+
+```shell
+docker run -it pauldhein/telemarket-model:latest python dataset_processor.py -p ../data/bank-full.csv
+```
+
+The `-p` flag specifies the full path of the CSV file to be processed.
 
 ### Model training
 
-This experiment ...
+This experiment performs a grid search over specified hyperparameter sets for five different classification models. Extra processing is done during the experiment to:
+
+1. Account for class imbalance in the labels
+2. Select the top 20 features to improve classification using a mutual information statistic
+3. Standardize the feature values using min-max standardization
+
+The experiment can be run using the following command:
+
+```shell
+docker run -it pauldhein/telemarket-model:latest python model_trainer.py -p ../data/bank-full
+```
+
+The `-p` flag provides the prefix-path of the dataset to be used for training and evaulation.
 
 ### Model evaluation
 
-This experiment ...
+This experiment verifies the performance of the various saved classifier configurations on either development data or test data. The experiment can be run using the following command:
 
-### Observed metrics from the development set
+```shell
+docker run -it pauldhein/telemarket-model:latest python model_evaluator.py -t -d
+```
 
-| Model Name | Accuracy | Precision | Recall | F1 | AUC-ROC |
-| ---: | :---: | :---: | :---: | :---: | :---: |
-| Logistic Regression | 0.8593 | 0.4332 | 0.8644 | 0.5771 | 0.8616 |
-| Random Forest       | **0.9034** | **0.5933** | 0.4125 | 0.4867 | 0.6886 |
-| Naive Bayes         | 0.8334 | 0.3622 | 0.6574 | 0.4671 | 0.7564 |
-| Linear SVM          | 0.2799 | 0.0498 | 0.3032 | 0.0855 | 0.2901 |
-| Neural Network      | 0.8501 | 0.4212 | **0.9344** | **0.5806** | **0.8870** |
+The `-t` and `-d` flags specify to evaulate on the test set and the development set respectively.
 
-### Observed metrics from the test set
+## Experimental Results
+
+### Evaluation metrics for the test set
 
 | Model Name | Accuracy | Precision | Recall | F1 | AUC-ROC |
 | ---: | :---: | :---: | :---: | :---: | :---: |
@@ -46,3 +62,7 @@ This experiment ...
 | Naive Bayes         | 0.8371 | 0.3616 | 0.6592 | 0.4670 | 0.7589 |
 | Linear SVM          | 0.2765 | 0.0501 | 0.3161 | 0.0865 | 0.2939 |
 | Neural Network      | 0.8555 | 0.4242 | **0.9350** | **0.5836** | **0.8904** |
+
+### ROC curve for the test set
+
+![Multi-model ROC curves](data/roc_test.png)
